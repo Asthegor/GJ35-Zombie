@@ -30,14 +30,21 @@
     <ClCompile Include="Game\Player.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Enemy\ZombieFactory.cpp">
+    <ClCompile Include="Game\Factory.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\PlayerBullet.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Bullet.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Enemy.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="$(MSBuildThisFileDirectory)../../build/native/bin/x64/dynamic/Dina.dll" />
-    <None Include="$(MSBuildThisFileDirectory)../../build/native/bin/x64/dynamic/libxml2.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Menus\Logo\Logo.h">
@@ -55,7 +62,19 @@
     <ClInclude Include="Game\Player.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Enemy\ZombieFactory.h">
+    <ClInclude Include="Game\Factory.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\PlayerBullet.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Bullet.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Enemy.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Entity.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

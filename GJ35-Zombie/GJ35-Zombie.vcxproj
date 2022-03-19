@@ -81,7 +81,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dina_Game.cpp" />
-    <ClCompile Include="Game\Enemy\ZombieFactory.cpp" />
+    <ClCompile Include="Game\Bullet.cpp" />
+    <ClCompile Include="Game\Enemy.cpp" />
+    <ClCompile Include="Game\PlayerBullet.cpp" />
+    <ClCompile Include="Game\Factory.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\Player.cpp" />
     <ClCompile Include="Menus\Logo\Logo.cpp" />
@@ -92,7 +95,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dina_Game.h" />
-    <ClInclude Include="Game\Enemy\ZombieFactory.h" />
+    <ClInclude Include="Game\Bullet.h" />
+    <ClInclude Include="Game\Enemy.h" />
+    <ClInclude Include="Game\Entity.h" />
+    <ClInclude Include="Game\PlayerBullet.h" />
+    <ClInclude Include="Game\Factory.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\Player.h" />
     <ClInclude Include="Menus\Logo\Logo.h" />

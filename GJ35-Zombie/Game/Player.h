@@ -1,6 +1,8 @@
 #pragma once
 #include <Dina.h>
 #include <map>
+#include <vector>
+#include "PlayerBullet.h"
 
 enum Direction
 {
@@ -18,6 +20,8 @@ public:
 	virtual void Update(double deltatime) override;
 	virtual void Draw() override;
 
+	void SetLevelDimensions(Dina::Point const levelDimensions);
+
 	// Hérité de Component::Event::KeyboardEvent
 	virtual void OnKeyPressed(Dina::KeyCode key) override;
 	virtual void OnKeyReleased(Dina::KeyCode key) override;
@@ -28,15 +32,25 @@ public:
 	virtual void OnMousePressed(int button, int x, int y, int clicks);
 	virtual void OnMouseReleased(int button, int x, int y);
 
-	Dina::FPoint* GetPosition();
-	void SetPosition(Dina::FPoint* point);
-	Dina::FPoint* GetCameraPosition();
-	void SetCameraPosition(Dina::FPoint* point);
+	void SetPosition(Dina::FPoint point);
+	void SetCameraPosition(Dina::FPoint point);
 	Dina::Quad GetDimensions();
+	void SetCameraOffset(Dina::FPoint cameraOffset);
+	Dina::Point GetOrigin();
+
+	Dina::FPoint* GetPosition() { return m_Position; }
+	Dina::FPoint GetOrientation() { return m_Orientation; }
+	Dina::FPoint* GetCameraPosition() { return m_CameraPosition; }
+
+	double GetAngle() { return m_Angle; }
+
+	bool CanShoot() { return m_CanShoot; }
+	void CanShoot(bool canShoot);
 
 private:
-	bool m_CanShootPrincipal = true;
-	bool m_CanShootSecondary = true;
+	bool m_CanShoot = true;
+	double m_ShootTimer = 0.0;
+	double m_ShootDelay = 1.0;
 
 	std::map<std::string, Dina::Animation*> m_Animations;
 	Dina::Animation* m_CurrentAnimation = nullptr;
@@ -44,8 +58,12 @@ private:
 	Dina::Quad* m_Dimensions = nullptr;
 	Dina::FPoint* m_Position = nullptr;
 	Dina::FPoint* m_CameraPosition = nullptr;
+	Dina::Point m_LevelDimensions;
+	Dina::FPoint m_CameraOffset;
+	Dina::FPoint m_Orientation;
 
-	int m_Direction = 0;
+
+	int m_Move = 0;
 
 	int m_Speed = 0;
 
@@ -53,5 +71,7 @@ private:
 	std::string m_Action = "";
 
 	double m_Angle = 0.0;
+
+	std::vector<PlayerBullet*> m_Bullets;
 };
 

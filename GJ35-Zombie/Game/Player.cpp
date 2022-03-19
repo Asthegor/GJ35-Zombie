@@ -197,10 +197,10 @@ void Player::Load()
 		animation = new Dina::Animation(prefix.c_str(), extension.c_str(), 3, 0.125);
 		m_Animations[weapon + "_" + action] = animation;
 	}
-	m_Weapon = "flashlight";
+	m_Weapon = "handgun";
 	m_Action = "idle";
 	m_CurrentAnimation = m_Animations[m_Weapon + "_" + m_Action];
-	m_Speed = 50;
+	m_Speed = 100;
 
 	m_Dimensions = m_CurrentAnimation->GetDimensions();
 
@@ -212,7 +212,7 @@ void Player::Update(double deltatime)
 	// Calcul de l'angle en degrés
 	float angle_deg = 0.0f;
 
-	switch (m_Direction)
+	switch (m_Move)
 	{
 		case Direction::Down:
 			angle_deg = 0.0f;
@@ -245,14 +245,14 @@ void Player::Update(double deltatime)
 
 	float vx = 0.0f;
 	float vy = 0.0f;
-	if (m_Direction > 0 && angle_deg >= 0.0f)
+	if (m_Move > 0 && angle_deg >= 0.0f)
 	{
-		float angle_rad = angle_deg * M_PI / 180.0f;
-		vx = std::sin(angle_rad) * m_Speed * deltatime;
+		float angle_rad = static_cast<float>(angle_deg * M_PI / 180.0f);
+		vx = static_cast<float>(std::sin(angle_rad) * m_Speed * deltatime);
 		if (std::abs(vx) < 0.0001f)
 			vx = 0.0f;
 
-		vy = std::cos(angle_rad) * m_Speed * deltatime;
+		vy = static_cast<float>(std::cos(angle_rad) * m_Speed * deltatime);
 		if (std::abs(vy) < 0.0001f)
 			vy = 0.0f;
 	}
@@ -264,15 +264,48 @@ void Player::Update(double deltatime)
 		m_CurrentAnimation->SetPosition(static_cast<int>(m_Position->x), static_cast<int>(m_Position->y));
 		m_CurrentAnimation->Update(deltatime);
 	}
+
+	// Gestion des tirs
+	for (auto bullet : m_Bullets)
+	{
+		//bullet->SetLevelDimensions(m_LevelDimensions);
+		bullet->SetCameraOffset(m_CameraOffset);
+		bullet->Update(deltatime);
+	}
+	
+	for (int i = static_cast<int>(m_Bullets.size()) - 1; i >= 0; --i)
+	{
+		if (m_Bullets[i]->IsAway())
+			m_Bullets.erase(m_Bullets.begin() + i);
+	}
+
+	if (!m_CanShoot)
+	{
+		m_ShootTimer -= deltatime;
+		if (m_ShootTimer <= 0.0)
+		{
+			m_CanShoot = true;
+			m_ShootTimer = m_ShootDelay;
+		}
+	}
+	
 }
 void Player::Draw()
 {
+	for (auto bullet : m_Bullets)
+		bullet->Draw();
 	if (m_CurrentAnimation)
 		m_CurrentAnimation->Draw();
-	std::string str = m_Weapon + "_" + m_Action;
-	Dina::Font* font = new Dina::Font(str.c_str(), "Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 12);
+
+	std::string str = "[" + std::to_string(m_CameraPosition->x) + ", " + std::to_string(m_CameraPosition->y) + "]";
+	Dina::Font* font = new Dina::Font(str.c_str(), "Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 15);
 	Dina::Graphic::DrawSurface(font->GetSurface());
 	delete font;
+}
+
+void Player::SetLevelDimensions(Dina::Point const levelDimensions)
+{
+	m_LevelDimensions = levelDimensions;
 }
 
 
@@ -280,13 +313,13 @@ void Player::Draw()
 void Player::OnKeyPressed(Dina::KeyCode key)
 {
 	if (key == Dina::KeyCode::Left)
-		m_Direction |= Direction::Left;
+		m_Move |= Direction::Left;
 	if (key == Dina::KeyCode::Right)
-		m_Direction |= Direction::Right;
+		m_Move |= Direction::Right;
 	if (key == Dina::KeyCode::Up)
-		m_Direction |= Direction::Up;
+		m_Move |= Direction::Up;
 	if (key == Dina::KeyCode::Down)
-		m_Direction |= Direction::Down;
+		m_Move |= Direction::Down;
 }
 void Player::OnKeyReleased(Dina::KeyCode key)
 {
@@ -294,26 +327,26 @@ void Player::OnKeyReleased(Dina::KeyCode key)
 	{
 		case Dina::KeyCode::Left:
 			{
-				if(m_Direction & Direction::Left)
-					m_Direction -= Direction::Left;
+				if(m_Move & Direction::Left)
+					m_Move -= Direction::Left;
 			}
 			break;
 		case Dina::KeyCode::Right:
 			{
-				if (m_Direction & Direction::Right)
-					m_Direction -= Direction::Right;
+				if (m_Move & Direction::Right)
+					m_Move -= Direction::Right;
 			}
 			break;
 		case Dina::KeyCode::Up:
 			{
-				if (m_Direction & Direction::Up)
-					m_Direction -= Direction::Up;
+				if (m_Move & Direction::Up)
+					m_Move -= Direction::Up;
 			}
 			break;
 		case Dina::KeyCode::Down:
 			{
-				if (m_Direction & Direction::Down)
-					m_Direction -= Direction::Down;
+				if (m_Move & Direction::Down)
+					m_Move -= Direction::Down;
 			}
 			break;
 
@@ -356,60 +389,73 @@ void Player::OnMouseMove(int x, int y)
 {
 	//Changement d'orientation du joueur
 	Dina::Point* origin = m_CurrentAnimation->GetOrigin();
-	double rad_angle = std::atan2(y - m_Position->y - origin->y, x - m_Position->x - origin->x);
+	double rad_angle = std::atan2(y - m_CameraPosition->y - origin->y, x - m_CameraPosition->x - origin->x);
 	m_Angle = rad_angle * 180 / M_PI;
+
+	float px = static_cast<float>(x);
+	float py = static_cast<float>(y);
+	float cx = m_CameraPosition->x;// +static_cast<float>(origin->x);
+	float cy = m_CameraPosition->y;// +static_cast<float>(origin->y);
+	float dx = px - cx;
+	float dy = py - cy;
+	float d = std::sqrt(dx * dx + dy * dy);
+	m_Orientation = { dx / d, dy / d };
+
 	m_CurrentAnimation->SetRotation(m_Angle);
 }
 void Player::OnMousePressed(int button, int x, int y, int clicks)
 {
-	//Tirs du joueur
-	switch (button)
-	{
-		case 1: //Tir principal
-			{
-				m_CanShootPrincipal = false;
-			}
-			break;
-		case 2: //Tir secondaire (si j'ai le temps)
-			{
-				m_CanShootSecondary = false;
-			}
-			break;
-	}
+	////Tirs du joueur
+	//switch (button)
+	//{
+	//	case 1: //Tir principal
+	//		{
+	//			if (m_CanShoot)
+	//			{
+	//				Dina::Point origin = *m_CurrentAnimation->GetOrigin();
+	//				Dina::FPoint bulletPosition { m_Position->x + origin.x, m_Position->y + origin.y };
+	//				PlayerBullet* bullet = new PlayerBullet(bulletPosition, m_Orientation, m_Angle);
+	//				m_Bullets.push_back(bullet);
+	//				m_CanShoot = false;
+	//			}
+	//		}
+	//		break;
+	//}
 }
 void Player::OnMouseReleased(int button, int x, int y)
 {
-	if (button == 1)
-		m_CanShootPrincipal = true;
-	if (button == 2)
-		m_CanShootSecondary = true;
 }
 
-Dina::FPoint* Player::GetPosition()
+void Player::SetPosition(Dina::FPoint point)
 {
-	return m_Position;
+	m_Position->x = point.x;
+	m_Position->y = point.y;
 }
 
-void Player::SetPosition(Dina::FPoint* point)
+void Player::SetCameraPosition(Dina::FPoint point)
 {
-	m_Position->x = point->x;
-	m_Position->y = point->y;
-}
-
-Dina::FPoint* Player::GetCameraPosition()
-{
-	return m_CameraPosition;
-}
-
-void Player::SetCameraPosition(Dina::FPoint* point)
-{
-	m_CameraPosition->x = point->x;
-	m_CameraPosition->y = point->y;
+	m_CameraPosition->x = point.x;
+	m_CameraPosition->y = point.y;
 	m_CurrentAnimation->SetPosition(static_cast<int>(m_CameraPosition->x), static_cast<int>(m_CameraPosition->y));
 }
 
 Dina::Quad Player::GetDimensions()
 {
 	Dina::Quad* dim = m_CurrentAnimation->GetDimensions();
-	return Dina::Quad(m_Position->x, m_Position->y, dim->width, dim->height);
+	return Dina::Quad(static_cast<int>(m_Position->x), static_cast<int>(m_Position->y), dim->width, dim->height);
+}
+
+Dina::Point Player::GetOrigin()
+{
+	return *m_CurrentAnimation->GetOrigin();
+}
+
+void Player::CanShoot(bool canShoot)
+{
+	m_CanShoot = canShoot;
+}
+
+void Player::SetCameraOffset(Dina::FPoint cameraOffset)
+{
+	m_CameraOffset = cameraOffset;
 }
