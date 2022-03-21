@@ -35,6 +35,7 @@ void Game::Update(double deltatime)
 
 	for (auto& bullet : m_Bullets)
 	{
+		bullet->SetCameraOffset(*m_Camera);
 		bullet->Update(deltatime);
 		Dina::FPoint bulletFloatPosition = bullet->GetPosition();
 		Dina::Point bulletPosition { static_cast<int>(bulletFloatPosition.x), static_cast<int>(bulletFloatPosition.y) };
@@ -52,35 +53,52 @@ void Game::Update(double deltatime)
 		}
 	}
 
-	m_Enemies.erase(std::find_if(m_Enemies.begin(),
-								 m_Enemies.end(),
-								 [](Enemy* enemy)
-									{
-										return enemy->IsDead();
-									}));
+	for (auto it = m_Enemies.begin(); it != m_Enemies.end();)
+	{
+		if ((*it)->IsDead())
+			it = m_Enemies.erase(it);
+		else
+			it++;
+	}
 
 	for (auto& enemy : m_Enemies)
 	{
 		// Mise à jour des animations
+		enemy->SetCameraOffset(*m_Camera);
 		enemy->Update(deltatime);
 
 		// Vérification des actions
 		Dina::FPoint enemyPosition = enemy->GetPosition();
 		Dina::FPoint playerPosition = *m_Player->GetPosition();
 		float distance = Dina::Maths::Distance(enemyPosition.x, enemyPosition.y, playerPosition.x, playerPosition.y);
-		if (distance < Enemy::DectionDistance)
+		if (distance <= Enemy::DetectionDistance)
 		{
-			Dina::FPoint direction;
+			double rad_angle = std::atan2(playerPosition.y - enemyPosition.y, playerPosition.x - enemyPosition.x);
+			enemy->SetAngle(rad_angle * 180 / M_PI);
 
-			enemy->SetDirection(direction);
-
-			if (distance < Enemy::DectionDistance * 0.1f)
+			if (distance <= Enemy::AttackDistance)
+			{
+				enemy->SetDirection({ 0,0 });
 				enemy->SetAnimation("attack");
+			}
 			else
+			{
+				Dina::FPoint direction;
+				float px = playerPosition.x;
+				float py = playerPosition.y;
+				float cx = enemyPosition.x;
+				float cy = enemyPosition.y;
+				float dx = px - cx;
+				float dy = py - cy;
+				float d = std::sqrt(dx * dx + dy * dy);
+				direction = { dx / d, dy / d };
+				enemy->SetDirection(direction);
 				enemy->SetAnimation("move");
+			}
 		}
 		else
 		{
+			enemy->SetDirection({ 0,0 });
 			enemy->SetAnimation("idle");
 		}
 		enemy->SetPosition(enemyPosition);
@@ -156,7 +174,7 @@ void Game::UpdatePlayer(double deltatime)
 		m_Player->SetCameraPosition({ playerOriCam });
 		m_Player->SetPosition({ static_cast<float>(playerOriDim.x), static_cast<float>(playerOriDim.y) });
 	}
-	m_Player->SetCameraOffset(*m_Camera);
+	//m_Player->SetCameraOffset(*m_Camera);
 	m_Player->SetCameraPosition({ pX, pY });
 }
 
@@ -206,6 +224,4 @@ void Game::OnMousePressed(int button, int x, int y, int clicks)
 }
 void Game::OnMouseReleased(int button, int x, int y)
 {
-	if (m_Player)
-		m_Player->OnMouseReleased(button, x, y);
 }

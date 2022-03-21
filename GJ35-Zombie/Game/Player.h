@@ -29,13 +29,10 @@ public:
 
 	// Hérité de Component::Event::MouseEvent
 	virtual void OnMouseMove(int x, int y);
-	virtual void OnMousePressed(int button, int x, int y, int clicks);
-	virtual void OnMouseReleased(int button, int x, int y);
 
 	void SetPosition(Dina::FPoint point);
 	void SetCameraPosition(Dina::FPoint point);
 	Dina::Quad GetDimensions();
-	void SetCameraOffset(Dina::FPoint cameraOffset);
 	Dina::Point GetOrigin();
 
 	Dina::FPoint* GetPosition() { return m_Position; }

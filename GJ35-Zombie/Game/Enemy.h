@@ -11,8 +11,10 @@ public:
 	
 	void SetPosition(Dina::FPoint position);
 	Dina::FPoint GetPosition() const;
+
 	void SetDirection(Dina::FPoint direction);
 	Dina::FPoint GetDirection() const;
+	
 	void SetAngle(double angle);
 	double GetAngle() const;
 
@@ -24,6 +26,7 @@ public:
 
 public:
 	void SetAnimation(std::string name);
+	void SetCameraOffset(Dina::FPoint cameraOffset);
 	
 	// Hérité via Entity
 	virtual std::string GetName() override;
@@ -31,16 +34,19 @@ public:
 	virtual void Update(double deltatime);
 	virtual void Draw() override;
 
-	static const float DectionDistance;
+	static const float DetectionDistance;
+	static const float AttackDistance;
 
 private:
 	int m_Life = 100;
+	int m_Speed = 35;
 
 	std::map<std::string, Dina::Animation*> m_Animations;
 	Dina::Animation* m_CurrentAnimation = nullptr;
 	Dina::FPoint m_Position;
 	Dina::FPoint m_Direction;
 	Dina::FPoint m_Origin;
+	Dina::FPoint m_CameraOffset;
 
 	double m_Angle;
 };

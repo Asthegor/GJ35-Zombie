@@ -265,20 +265,6 @@ void Player::Update(double deltatime)
 		m_CurrentAnimation->Update(deltatime);
 	}
 
-	// Gestion des tirs
-	for (auto bullet : m_Bullets)
-	{
-		//bullet->SetLevelDimensions(m_LevelDimensions);
-		bullet->SetCameraOffset(m_CameraOffset);
-		bullet->Update(deltatime);
-	}
-	
-	for (int i = static_cast<int>(m_Bullets.size()) - 1; i >= 0; --i)
-	{
-		if (m_Bullets[i]->IsAway())
-			m_Bullets.erase(m_Bullets.begin() + i);
-	}
-
 	if (!m_CanShoot)
 	{
 		m_ShootTimer -= deltatime;
@@ -292,15 +278,8 @@ void Player::Update(double deltatime)
 }
 void Player::Draw()
 {
-	for (auto bullet : m_Bullets)
-		bullet->Draw();
 	if (m_CurrentAnimation)
 		m_CurrentAnimation->Draw();
-
-	std::string str = "[" + std::to_string(m_CameraPosition->x) + ", " + std::to_string(m_CameraPosition->y) + "]";
-	Dina::Font* font = new Dina::Font(str.c_str(), "Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 15);
-	Dina::Graphic::DrawSurface(font->GetSurface());
-	delete font;
 }
 
 void Player::SetLevelDimensions(Dina::Point const levelDimensions)
@@ -403,28 +382,6 @@ void Player::OnMouseMove(int x, int y)
 
 	m_CurrentAnimation->SetRotation(m_Angle);
 }
-void Player::OnMousePressed(int button, int x, int y, int clicks)
-{
-	////Tirs du joueur
-	//switch (button)
-	//{
-	//	case 1: //Tir principal
-	//		{
-	//			if (m_CanShoot)
-	//			{
-	//				Dina::Point origin = *m_CurrentAnimation->GetOrigin();
-	//				Dina::FPoint bulletPosition { m_Position->x + origin.x, m_Position->y + origin.y };
-	//				PlayerBullet* bullet = new PlayerBullet(bulletPosition, m_Orientation, m_Angle);
-	//				m_Bullets.push_back(bullet);
-	//				m_CanShoot = false;
-	//			}
-	//		}
-	//		break;
-	//}
-}
-void Player::OnMouseReleased(int button, int x, int y)
-{
-}
 
 void Player::SetPosition(Dina::FPoint point)
 {
@@ -453,9 +410,4 @@ Dina::Point Player::GetOrigin()
 void Player::CanShoot(bool canShoot)
 {
 	m_CanShoot = canShoot;
-}
-
-void Player::SetCameraOffset(Dina::FPoint cameraOffset)
-{
-	m_CameraOffset = cameraOffset;
 }
