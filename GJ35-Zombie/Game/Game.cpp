@@ -32,7 +32,13 @@ void Game::Update(double deltatime)
 {
 	UpdatePlayer(deltatime);
 
-
+	for (auto it = m_Bullets.begin(); it != m_Bullets.end();)
+	{
+		if ((*it)->IsAway())
+			it = m_Bullets.erase(it);
+		else
+			it++;
+	}
 	for (auto& bullet : m_Bullets)
 	{
 		bullet->SetCameraOffset(*m_Camera);
