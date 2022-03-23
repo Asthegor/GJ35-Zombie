@@ -21,6 +21,9 @@ public:
 
 	Dina::FPoint GetPosition() { return m_Position; }
 	int GetDamagePoints() const {return m_DamagePoints; }
+
+	void ToDelete(bool toDelete);
+	bool ToDelete();
 private:
 
 	Dina::Texture* m_Texture = nullptr;
@@ -30,6 +33,7 @@ private:
 
 	Dina::FPoint m_CameraOffset;
 
+	bool m_ToDelete = false;
 	float m_Speed = 600.0;
 	float m_MaxLength = 400.0;
 	float m_Distance = 0.0;

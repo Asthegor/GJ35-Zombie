@@ -3,6 +3,7 @@
 PlayerBullet::PlayerBullet(Dina::FPoint position, Dina::FPoint direction, double angle) :
 	m_Position(position), m_OriginPosition(position), m_Direction(direction)
 {
+	DINA_INFO("PlayerBullet constructor");
 	m_Texture = new Dina::Texture("Datas/Images/Game/Bullet.png");
 	m_Texture->SetPosition(static_cast<int>(m_Position.x), static_cast<int>(m_Position.y));
 	m_Texture->SetAngle(angle);

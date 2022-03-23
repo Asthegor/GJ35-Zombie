@@ -371,10 +371,22 @@ void Player::OnMouseMove(int x, int y)
 	double rad_angle = std::atan2(y - m_CameraPosition->y - origin->y, x - m_CameraPosition->x - origin->x);
 	m_Angle = rad_angle * 180 / M_PI;
 
+	float cx, cy;
+	Dina::Quad screen = *Dina::Graphic::GetDimensions();
+	if (m_CameraPosition->x < screen.width / 2.0f - 1.0f || m_CameraPosition->x > screen.width / 2.0f + 1.0f)
+		cx = m_CameraPosition->x + static_cast<float>(origin->x);
+	else
+		cx = m_CameraPosition->x;
+
+	if (m_CameraPosition->y < screen.height / 2.0f - 1.0f || m_CameraPosition->y > screen.height / 2.0f + 1.0f)
+		cy = m_CameraPosition->y + static_cast<float>(origin->y);
+	else
+		cy = m_CameraPosition->y;
+
+
+
 	float px = static_cast<float>(x);
 	float py = static_cast<float>(y);
-	float cx = m_CameraPosition->x;// +static_cast<float>(origin->x);
-	float cy = m_CameraPosition->y;// +static_cast<float>(origin->y);
 	float dx = px - cx;
 	float dy = py - cy;
 	float d = std::sqrt(dx * dx + dy * dy);

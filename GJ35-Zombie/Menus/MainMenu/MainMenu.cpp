@@ -19,16 +19,16 @@ void MainMenu::Load()
 
 	// Ajout des items du menu
 	m_MenuManager->AddItem("Jouer", "Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 48,
-						   [this]() { OnPlayPressed(); },											// Action
-						   nullptr,																	// action on Hover
+						   [this](Dina::MenuItem* menuItem) { OnPlayPressed(); },											// Action
+						   [this](Dina::MenuItem* menuItem, bool state) { OnHover(menuItem, state); },													// Action on Hover
 						   { 255,255,255 }, { 0,255,0 });										    // Couleur de base, couleur en surbrillance
 	m_MenuManager->AddItem("Crédits", "Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 48,
-						   [this]() { OnCreditsPressed(); },										// Action
-						   nullptr,																	// action on Hover
+						   [this](Dina::MenuItem* menuItem) { OnCreditsPressed(); },										// Action
+						   [this](Dina::MenuItem* menuItem, bool state) { OnHover(menuItem, state); },													// Action on Hover
 						   { 255,255,255 }, { 0,255,0 });											// Couleur de base, couleur en surbrillance
 	m_MenuManager->AddItem("Quitter", "Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 48,
-						   [this]() { OnQuitGame(); },												// Action
-						   nullptr,																	// action on Hover
+						   [this](Dina::MenuItem* menuItem) { OnQuitGame(); },												// Action
+						   [this](Dina::MenuItem* menuItem, bool state) { OnHover(menuItem, state); },													// Action on Hover
 						   { 255,255,255 }, { 0,255,0 });											// Couleur de base, couleur en surbrillance
 
 	Dina::Quad* screen = Dina::Graphic::GetDimensions();
@@ -94,4 +94,12 @@ void MainMenu::OnCreditsPressed()
 void MainMenu::OnQuitGame()
 {
 	Dina::EventManager::QuitGame();
+}
+
+void MainMenu::OnHover(Dina::MenuItem* menuItem, bool state)
+{
+	if (state)
+		menuItem->SetSelectedFont("Datas/Fonts/Anton/Anton-Regular.ttf", 48);
+	else
+		menuItem->SetSelectedFont("Datas/Fonts/Audiowide/Audiowide-Regular.ttf", 48);
 }

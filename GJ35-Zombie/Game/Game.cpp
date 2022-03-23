@@ -26,7 +26,7 @@ void Game::Load()
 	m_Player->SetLevelDimensions(m_Level->GetDimensions());
 
 
-	m_Enemies.push_back(static_cast<Enemy*>(m_Factory->CreateEntity(EntityType::Enemy, { 200.0f, 200.0f })));
+	SpawnZombies();
 }
 void Game::Update(double deltatime)
 {
@@ -34,28 +34,46 @@ void Game::Update(double deltatime)
 
 	for (auto it = m_Bullets.begin(); it != m_Bullets.end();)
 	{
-		if ((*it)->IsAway())
+		if ((*it)->ToDelete())
+		{
 			it = m_Bullets.erase(it);
+		}
 		else
+		{
 			it++;
+		}
 	}
+
 	for (auto& bullet : m_Bullets)
 	{
-		bullet->SetCameraOffset(*m_Camera);
-		bullet->Update(deltatime);
-		Dina::FPoint bulletFloatPosition = bullet->GetPosition();
-		Dina::Point bulletPosition { static_cast<int>(bulletFloatPosition.x), static_cast<int>(bulletFloatPosition.y) };
-		for (auto& enemy : m_Enemies)
+		if (!bullet->ToDelete())
 		{
-			Dina::Quad enemyDimensions = enemy->GetDimensions();
-			int x = enemyDimensions.x + enemyDimensions.width / 4;
-			int y = enemyDimensions.y + enemyDimensions.height / 4;
-			int w = enemyDimensions.width / 2;
-			int h = enemyDimensions.height / 2;
-			Dina::Quad collidebox { x, y, w, h };
+			bullet->SetCameraOffset(*m_Camera);
+			bullet->Update(deltatime);
+			Dina::FPoint bulletFloatPosition = bullet->GetPosition();
+			Dina::Point bulletPosition { static_cast<int>(bulletFloatPosition.x), static_cast<int>(bulletFloatPosition.y) };
+			for (auto& enemy : m_Enemies)
+			{
+				if (!enemy->IsDead())
+				{
+					Dina::Quad enemyDimensions = enemy->GetDimensions();
+					Dina::FPoint enemyPosition = enemy->GetPosition();
+					int x = static_cast<int>(enemyPosition.x - m_Camera->x + enemyDimensions.width / 4);
+					int y = static_cast<int>(enemyPosition.y - m_Camera->y + enemyDimensions.height / 4);
+					int w = enemyDimensions.width / 2;
+					int h = enemyDimensions.height / 2;
+					Dina::Quad collidebox { x, y, w, h };
+					DINA_TRACE("Bulletposition {0},{1}]; enemyPosition [{2}, {3}", bulletPosition.x, bulletPosition.y, enemyPosition.x, enemyPosition.y);
+					DINA_TRACE("CollideBox {0}, {1}, {2}, {3}", x, y, w, h);
 
-			if (Dina::Collisions::Collide(bulletPosition, collidebox))
-				enemy->GetDamage(bullet->GetDamagePoints());
+					if (Dina::Collisions::Collide(bulletPosition, collidebox))
+					{
+						enemy->GetDamage(bullet->GetDamagePoints());
+						bullet->ToDelete(true);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -192,6 +210,12 @@ void Game::OnKeyPressed(Dina::KeyCode key)
 }
 void Game::OnKeyReleased(Dina::KeyCode key)
 {
+	if (key == Dina::KeyCode::Key_R)
+		SpawnZombies();
+
+	if (key == Dina::KeyCode::Escape)
+		Dina::GameState::SetCurrentState("Logo");
+
 	if (m_Player)
 		m_Player->OnKeyReleased(key);
 }
@@ -220,6 +244,7 @@ void Game::OnMousePressed(int button, int x, int y, int clicks)
 					Dina::FPoint playerPosition = *m_Player->GetPosition();
 					Dina::FPoint bulletPosition { playerPosition.x + origin.x, playerPosition.y + origin.y };
 					Dina::FPoint playerOrientation = m_Player->GetOrientation();
+
 					Bullet* bullet = new Bullet(bulletPosition, playerOrientation, m_Player->GetAngle());
 					m_Bullets.push_back(bullet);
 					m_Player->CanShoot(false);
@@ -230,4 +255,9 @@ void Game::OnMousePressed(int button, int x, int y, int clicks)
 }
 void Game::OnMouseReleased(int button, int x, int y)
 {
+}
+
+void Game::SpawnZombies()
+{
+	m_Enemies.push_back(static_cast<Enemy*>(m_Factory->CreateEntity(EntityType::Enemy, { 200.0f, 200.0f })));
 }

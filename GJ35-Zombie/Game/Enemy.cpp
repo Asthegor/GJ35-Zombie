@@ -44,7 +44,6 @@ Enemy::Enemy(Dina::FPoint position)
 	SetPosition(position);
 	float rndDirX = static_cast<float>(Dina::Random::GetValue(0.0, 2.0) - 1.0);
 	float rndDirY = static_cast<float>(Dina::Random::GetValue(0.0, 2.0) - 1.0);
-	DINA_INFO("Enemy direction : {0}, {1}", rndDirX, rndDirY);
 	SetDirection({ rndDirX, rndDirY });
 
 }
@@ -127,6 +126,16 @@ void Enemy::Draw()
 	if (dimensions->x >= 0 - dimensions->width * 2 && dimensions->x <= screen->width + dimensions->width * 2 &&
 		dimensions->y >= 0 - dimensions->height * 2 && dimensions->y <= screen->height + dimensions->height * 2)
 		m_CurrentAnimation->Draw();
+
+
+	//Dina::Quad enemyDimensions = GetDimensions();
+	//Dina::FPoint enemyPosition = GetPosition();
+	//int x = static_cast<int>(enemyPosition.x - m_CameraOffset.x + enemyDimensions.width / 4);
+	//int y = static_cast<int>(enemyPosition.y - m_CameraOffset.y + enemyDimensions.height / 4);
+	//int w = enemyDimensions.width / 2;
+	//int h = enemyDimensions.height / 2;
+	//Dina::Quad collidebox { x, y, w, h };
+	//Dina::Graphic::DrawRectangle(collidebox);
 }
 
 void Enemy::SetCameraOffset(Dina::FPoint cameraOffset)

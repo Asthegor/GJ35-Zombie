@@ -30,6 +30,7 @@ public:
 	virtual void OnMouseReleased(int button, int x, int y);
 
 private:
+	void SpawnZombies();
 
 	Factory* m_Factory = nullptr;
 
@@ -40,6 +41,8 @@ private:
 
 	std::vector<Enemy*> m_Enemies;
 	std::vector<Bullet*> m_Bullets;
+
+
 
 };
 

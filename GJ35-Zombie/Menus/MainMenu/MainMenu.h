@@ -25,6 +25,7 @@ private:
 	void OnPlayPressed();
 	void OnCreditsPressed();
 	void OnQuitGame();
+	void OnHover(Dina::MenuItem* menuItem, bool state);
 
 	Dina::MenuManager* m_MenuManager = nullptr;
 };

@@ -21,7 +21,7 @@ void Dina_Game::Load()
 	GameState::AddState("Game", new Game);
 
 	// Utiliser GameState::SetCurrentState pour définir l'état courant.
-	GameState::SetCurrentState("Game");
+	GameState::SetCurrentState("Logo");
 }
 
 void Dina_Game::Update(double deltatime)
