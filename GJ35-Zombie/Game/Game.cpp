@@ -58,13 +58,14 @@ void Game::Update(double deltatime)
 				{
 					Dina::Quad enemyDimensions = enemy->GetDimensions();
 					Dina::FPoint enemyPosition = enemy->GetPosition();
-					int x = static_cast<int>(enemyPosition.x - m_Camera->x + enemyDimensions.width / 4);
-					int y = static_cast<int>(enemyPosition.y - m_Camera->y + enemyDimensions.height / 4);
+					//int x = static_cast<int>(enemyPosition.x - m_Camera->x + enemyDimensions.width / 4);
+					int x = static_cast<int>(enemyPosition.x + enemyDimensions.width / 4);
+					//int y = static_cast<int>(enemyPosition.y - m_Camera->y + enemyDimensions.height / 4);
+					int y = static_cast<int>(enemyPosition.y + enemyDimensions.height / 4);
 					int w = enemyDimensions.width / 2;
 					int h = enemyDimensions.height / 2;
 					Dina::Quad collidebox { x, y, w, h };
-					DINA_TRACE("Bulletposition {0},{1}]; enemyPosition [{2}, {3}", bulletPosition.x, bulletPosition.y, enemyPosition.x, enemyPosition.y);
-					DINA_TRACE("CollideBox {0}, {1}, {2}, {3}", x, y, w, h);
+
 
 					if (Dina::Collisions::Collide(bulletPosition, collidebox))
 					{
